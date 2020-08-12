@@ -1,19 +1,19 @@
 import React, { useState, SetStateAction } from 'react';
-import { Login } from '../../Type';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 import styled from 'styled-components';
 import axios from 'axios';
-import Link from 'next/link';
 import Router from 'next/router';
-
-type Props = {
-  login: Login;
-  setLogin: React.Dispatch<SetStateAction<Login>>;
-};
+import { makeStyles } from '@material-ui/core/styles';
+import { Login } from '../../../Type';
+import { type } from 'os';
 
 interface userList {
   id: string;
   pass: string;
 }
+
+type openFlg = boolean;
 
 const Form = styled.div`
   display: flex;
@@ -28,8 +28,8 @@ const Form = styled.div`
     height: 1.5rem;
     width: 14rem;
   }
-  span {
-    font-size: 1.5rem;
+  .headline {
+    font-size: 2rem;
     margin-bottom: -2rem;
   }
 `;
@@ -60,9 +60,23 @@ const Btn = styled.button`
   }
 `;
 
-const LoginInput: React.FC<Props> = ({ login, setLogin }) => {
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100%',
+    '& > * + *': {
+      marginTop: theme.spacing(2),
+    },
+  },
+}));
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+const LoginInput = () => {
   const [inputId, setInputId] = useState('');
   const [inputPass, setInputPass] = useState('');
+  const [openFlg, setOpenFlg] = useState(false);
 
   const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputId(e.target.value);
@@ -72,41 +86,51 @@ const LoginInput: React.FC<Props> = ({ login, setLogin }) => {
     setInputPass(e.target.value);
   };
 
-  const loginProcess = () => {
+  const handleClick = () => {
     const url = 'https://jsondata.okiba.me/v1/json/Tc7BL200729151057';
 
     axios.get(url).then((res) => {
       const info: userList[] = res.data.users;
-      const loginFlg =
+      if (
         info.filter((i) => {
           return i.id == inputId && i.pass == inputPass;
-        }).length != 0;
-      const faildFlg = loginFlg ? false : true;
-      console.log(faildFlg);
-
-      const flg: Login = {
-        loginFlg: loginFlg,
-        failedFlg: faildFlg,
-      };
-      setLogin(flg);
+        }).length == 0
+      ) {
+        setOpenFlg(true);
+      } else {
+        if (!openFlg) {
+          Router.push({
+            pathname: '/MatchApp',
+          });
+        }
+      }
     });
-
-    if (login.loginFlg) {
-      Router.push({
-        pathname: '/',
-      });
-    }
   };
 
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenFlg(false);
+  };
+
+  const classes = useStyles();
+
   return (
-    <Form>
-      <ErrorMessage faild={login.failedFlg}>ログインできません</ErrorMessage>
-      <span>ID</span>
-      <input type="text" placeholder="id" value={inputId} onChange={handleIdChange} />
-      <span>Password</span>
-      <input type="password" placeholder="pass" value={inputPass} onChange={handlePassChange} />
-      <Btn onClick={loginProcess}>Login</Btn>
-    </Form>
+    <div className={classes.root}>
+      <Form>
+        <span className="headline">ID</span>
+        <input type="text" placeholder="id" value={inputId} onChange={handleIdChange} />
+        <span className="headline">Password</span>
+        <input type="password" placeholder="pass" value={inputPass} onChange={handlePassChange} />
+        <Btn onClick={handleClick}>Login</Btn>
+        <Snackbar open={openFlg} autoHideDuration={6000} onClose={handleClose}>
+          <Alert severity="error" onClose={handleClose}>
+            ログインできません
+          </Alert>
+        </Snackbar>
+      </Form>
+    </div>
   );
 };
 

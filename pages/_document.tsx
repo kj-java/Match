@@ -21,6 +21,15 @@ export default class MyDocument extends Document<Props> {
       <Html lang="ja">
         <Head>
           <meta charSet="utf-8" />
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+          />
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Noto+Sans+JP&subset=japanese"
+          />
+          <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
           {this.props.styleTags}
         </Head>
         <body>
