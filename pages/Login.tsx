@@ -1,8 +1,6 @@
-import { Login } from '../Type';
-import { FC, useState } from 'react';
 import styled from 'styled-components';
-import Link from 'next/link';
-import LoginInput from '../src/components/Form';
+import LoginInput from '../src/components/molecules/Form';
+import Title from 'components/atoms/Title';
 
 const Layout = styled.div`
   color: #0099ff;
@@ -13,20 +11,12 @@ const Layout = styled.div`
   }
 `;
 
-const initialState: Login = {
-  loginFlg: false,
-  failedFlg: false,
-};
-
 const LoginForm: React.FC = () => {
-  const [login, setLogin] = useState(initialState);
   return (
     <Layout>
       <main>
-        <div>
-          <span className="title">Match</span>
-        </div>
-        <LoginInput login={login} setLogin={setLogin}></LoginInput>
+        <Title size={'6rem'} />
+        <LoginInput />
       </main>
     </Layout>
   );
